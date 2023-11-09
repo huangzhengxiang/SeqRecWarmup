@@ -21,6 +21,7 @@ class AbstractDataset(metaclass=ABCMeta):
         self.min_uc = args.min_uc
         self.min_sc = args.min_sc
         self.split = args.split
+        print(self.min_rating,self.min_uc,self.min_sc,self.split)
 
         assert self.min_uc >= 2, 'Need at least 2 ratings per user for validation and test'
 
@@ -114,7 +115,7 @@ class AbstractDataset(metaclass=ABCMeta):
         # return df[['uid', 'sid', 'timestamp']]
         return df
 
-    def filter_triplets(self, df):
+    def filter_triplets(self, df: pd.DataFrame):
         print('Filtering triplets')
         if self.min_sc > 0:
             item_sizes = df.groupby('sid').size()
@@ -128,7 +129,7 @@ class AbstractDataset(metaclass=ABCMeta):
 
         return df
 
-    def densify_index(self, df):
+    def densify_index(self, df: pd.DataFrame):
         print('Densifying index')
         umap = {u: i for i, u in enumerate(set(df['uid']))}
         smap = {s: i for i, s in enumerate(set(df['sid']))}
