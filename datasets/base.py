@@ -114,7 +114,7 @@ class AbstractDataset(metaclass=ABCMeta):
         # return df[['uid', 'sid', 'timestamp']]
         return df
 
-    def filter_triplets(self, df):
+    def filter_triplets(self, df: pd.DataFrame):
         print('Filtering triplets')
         if self.min_sc > 0:
             item_sizes = df.groupby('sid').size()
@@ -128,7 +128,7 @@ class AbstractDataset(metaclass=ABCMeta):
 
         return df
 
-    def densify_index(self, df):
+    def densify_index(self, df: pd.DataFrame):
         print('Densifying index')
         umap = {u: i for i, u in enumerate(set(df['uid']))}
         smap = {s: i for i, s in enumerate(set(df['sid']))}
