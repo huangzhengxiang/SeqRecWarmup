@@ -21,7 +21,6 @@ class AbstractDataset(metaclass=ABCMeta):
         self.min_uc = args.min_uc
         self.min_sc = args.min_sc
         self.split = args.split
-        print(self.min_rating,self.min_uc,self.min_sc,self.split)
 
         assert self.min_uc >= 2, 'Need at least 2 ratings per user for validation and test'
 
@@ -132,7 +131,7 @@ class AbstractDataset(metaclass=ABCMeta):
     def densify_index(self, df: pd.DataFrame):
         print('Densifying index')
         umap = {u: i for i, u in enumerate(set(df['uid']))}
-        smap = {s: i for i, s in enumerate(set(df['sid']))}
+        smap = {s: i + 1 for i, s in enumerate(set(df['sid']))} # items are 1-indexed
         df['uid'] = df['uid'].map(umap)
         df['sid'] = df['sid'].map(smap)
         return df, umap, smap

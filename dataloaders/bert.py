@@ -107,6 +107,7 @@ class BertTrainDataset(data_utils.Dataset):
         tokens = []
         labels = []
         for s in seq:
+            assert s != 0
             prob = self.rng.random()
             if prob < self.mask_prob:
                 prob /= self.mask_prob
@@ -114,7 +115,7 @@ class BertTrainDataset(data_utils.Dataset):
                 if prob < 0.8:
                     tokens.append(self.mask_token)
                 elif prob < 0.9:
-                    tokens.append(self.rng.randint(1, self.num_items))
+                    tokens.append(self.rng.randint(1, self.num_items + 1))
                 else:
                     tokens.append(s)
 
