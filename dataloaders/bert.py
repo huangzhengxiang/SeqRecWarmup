@@ -11,7 +11,7 @@ class BertDataloader(AbstractDataloader):
         args.num_items = len(self.smap)
         self.max_len = args.bert_max_len
         self.mask_prob = args.bert_mask_prob
-        self.CLOZE_MASK_TOKEN = self.item_count + 1
+        self.CLOZE_MASK_TOKEN = self.item_count + 1  # [0, 1--item_count, MASK_TOKEN]
 
         code = args.train_negative_sampler_code
         train_negative_sampler = negative_sampler_factory(code, self.train, self.val, self.test,
@@ -88,6 +88,7 @@ class BertTrainDataset(data_utils.Dataset):
         tokens = []
         labels = []
         for s in seq:
+            assert s != 0
             prob = self.rng.random()
             if prob < self.mask_prob:
                 prob /= self.mask_prob
@@ -95,7 +96,7 @@ class BertTrainDataset(data_utils.Dataset):
                 if prob < 0.8:
                     tokens.append(self.mask_token)
                 elif prob < 0.9:
-                    tokens.append(self.rng.randint(1, self.num_items))
+                    tokens.append(self.rng.randint(1, self.num_items + 1))
                 else:
                     tokens.append(s)
 
