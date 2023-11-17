@@ -3,6 +3,7 @@ from .negative_samplers import negative_sampler_factory
 
 import torch
 import torch.utils.data as data_utils
+import numpy as np
 
 
 class BertDataloader(AbstractDataloader):
@@ -12,6 +13,7 @@ class BertDataloader(AbstractDataloader):
         self.max_len = args.bert_max_len
         self.mask_prob = args.bert_mask_prob
         self.CLOZE_MASK_TOKEN = self.item_count + 1
+        self.ticks = args.ticks
 
         code = args.train_negative_sampler_code
         train_negative_sampler = negative_sampler_factory(code, self.train, self.val, self.test,
@@ -58,13 +60,30 @@ class BertDataloader(AbstractDataloader):
     def _get_eval_loader(self, mode):
         batch_size = self.args.val_batch_size if mode == 'val' else self.args.test_batch_size
         dataset = self._get_eval_dataset(mode)
-        dataloader = data_utils.DataLoader(dataset, batch_size=batch_size,
-                                           shuffle=False, pin_memory=True)
+        dataloader = [data_utils.DataLoader(d, batch_size=batch_size,
+                                           shuffle=False, pin_memory=True) for d in dataset]
         return dataloader
 
     def _get_eval_dataset(self, mode):
         answers = self.val if mode == 'val' else self.test
-        dataset = BertEvalDataset(self.train, answers, self.max_len, self.CLOZE_MASK_TOKEN, self.test_negative_samples)
+        dataset = []
+        if mode == "val":
+            dataset.append(BertEvalDataset(self.train, 
+                                      answers, 
+                                      self.max_len, 
+                                      self.CLOZE_MASK_TOKEN, 
+                                      self.test_negative_samples, 
+                                      mode))
+        else:
+            for j in range(len(self.ticks)-1):
+                dataset.append(BertEvalDataset(self.train, 
+                                               answers, 
+                                               self.max_len, 
+                                               self.CLOZE_MASK_TOKEN, 
+                                               self.test_negative_samples, 
+                                               mode, 
+                                               min_uc=self.ticks[j],
+                                               max_uc=self.ticks[j+1]))
         return dataset
 
 
@@ -120,8 +139,8 @@ class BertTrainDataset(data_utils.Dataset):
 
 
 class BertEvalDataset(data_utils.Dataset):
-    def __init__(self, u2seq, u2answer, max_len, mask_token, negative_samples):
-        self.u2seq = u2seq
+    def __init__(self, u2seq, u2answer, max_len, mask_token, negative_samples, mode, min_uc=0, max_uc=np.inf):
+        self.u2seq = {uid: ulist for uid, ulist in u2seq.items() if (len(ulist)>=min_uc and len(ulist)<max_uc)} if mode=="test" else u2seq
         self.users = sorted(self.u2seq.keys())
         self.u2answer = u2answer
         self.max_len = max_len

@@ -142,7 +142,7 @@ class AbstractTrainer(metaclass=ABCMeta):
             self.log_extra_val_info(log_data)
             self.logger_service.log_val(log_data)
 
-    def test(self):
+    def test(self, ticks_id):
         print('Test best model with test set!')
 
         best_model = torch.load(os.path.join(self.export_root, 'models', 'best_acc_model.pth')).get('model_state_dict')
@@ -152,7 +152,7 @@ class AbstractTrainer(metaclass=ABCMeta):
         average_meter_set = AverageMeterSet()
 
         with torch.no_grad():
-            tqdm_dataloader = tqdm(self.test_loader)
+            tqdm_dataloader = tqdm(self.test_loader[ticks_id])
             for batch_idx, batch in enumerate(tqdm_dataloader):
                 batch = [x.to(self.device) for x in batch]
 

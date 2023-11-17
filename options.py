@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='RecPlay')
 ################
 # Top Level
 ################
-parser.add_argument('--mode', type=str, default='train', choices=['train'])
+parser.add_argument('--mode', type=str, default='train', choices=['train','test'])
 parser.add_argument('--template', type=str, default=None)
 
 ################
@@ -116,5 +116,20 @@ parser.add_argument('--experiment_description', type=str, default='test')
 
 
 ################
+# ticks
+################
+parser.add_argument("--ticks", type=int, default=1)
+parser.add_argument("--max-ticks", type=int, default=400)
+
+
+################
 args = parser.parse_args()
 set_template(args)
+
+
+################
+import numpy as np
+args.ticks = list(range(0, args.max_ticks, args.max_ticks//args.ticks)) + [np.inf]
+print("Ticks:")
+print(args.ticks)
+print(args.mode)

@@ -24,6 +24,10 @@ After training, it also asks you whether to run test set evaluation on the train
 python main.py --template train_bert
 ```
 
+```bash
+python main.py --template train_bert --ticks 20 --mode test --bert_max_len 100
+```
+
 ## DAE
 
 ```bash
