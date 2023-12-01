@@ -5,6 +5,8 @@ def set_template(args):
     elif args.template.startswith('train_bert'):
 
         args.dataset_code = 'ml-' + input('Input 1 for ml-1m, 20 for ml-20m: ') + 'm'
+        args.split_timestamp = int(input('Input timestamp to split: 1Mrange(956703932 ~ 1046454590)/20Mrange(789652004 ~ 1427784002)/(0 not split)'))
+        args.leaven = int(input('Input Size of test:'))
         args.min_rating = 0 if args.dataset_code == 'ml-1m' else 4
         args.min_uc = 5
         args.min_sc = 0
@@ -50,6 +52,7 @@ def set_template(args):
         args.mode = 'train'
 
         args.dataset_code = 'ml-' + input('Input 1 for ml-1m, 20 for ml-20m: ') + 'm'
+        args.split_timestamp = int(input('Input timestamp to split: 1Mrange(956703932 ~ 1046454590)/20Mrange(789652004 ~ 1427784002)/(0 not split)'))
         args.min_rating = 0 if args.dataset_code == 'ml-1m' else 4
         args.min_uc = 5
         args.min_sc = 0
@@ -86,6 +89,7 @@ def set_template(args):
         args.mode = 'train'
 
         args.dataset_code = 'ml-' + input('Input 1 for ml-1m, 20 for ml-20m: ') + 'm'
+        args.split_timestamp = int(input('Input timestamp to split: 1Mrange(956703932 ~ 1046454590)/20Mrange(789652004 ~ 1427784002)/(0 not split)'))
         args.min_rating = 0 if args.dataset_code == 'ml-1m' else 4
         args.min_uc = 5
         args.min_sc = 0
@@ -124,6 +128,7 @@ def set_template(args):
         args.mode = 'train'
 
         args.dataset_code = 'ml-' + input('Input 1 for ml-1m, 20 for ml-20m: ') + 'm'
+        args.split_timestamp = int(input('Input timestamp to split: 1Mrange(956703932 ~ 1046454590)/20Mrange(789652004 ~ 1427784002)/(0 not split)'))
         args.min_rating = 0 if args.dataset_code == 'ml-1m' else 4
         args.min_uc = 5
         args.min_sc = 0
