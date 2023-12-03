@@ -54,7 +54,7 @@ class VAETrainer(AbstractTrainer):
 
         return CE + self.beta * KLD
 
-    def calculate_metrics(self, batch):
+    def calculate_metrics(self, batch, backtrack=False):
         inputs, labels = batch
         logits, _, _ = self.model(inputs)
         logits[inputs!=0] = -float("Inf") # IMPORTANT: remove items that were in the input

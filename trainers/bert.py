@@ -5,8 +5,8 @@ import torch.nn as nn
 
 
 class BERTTrainer(AbstractTrainer):
-    def __init__(self, args, model, train_loader, val_loader, test_loader, export_root):
-        super().__init__(args, model, train_loader, val_loader, test_loader, export_root)
+    def __init__(self, args, model, train_loader, val_loader, test_loader, export_root, backtrack=False):
+        super().__init__(args, model, train_loader, val_loader, test_loader, export_root, backtrack=backtrack)
         self.ce = nn.CrossEntropyLoss(ignore_index=0)
 
     @classmethod
@@ -22,18 +22,18 @@ class BERTTrainer(AbstractTrainer):
     def log_extra_val_info(self, log_data):
         pass
 
-    def calculate_loss(self, batch):
+    def calculate_loss(self, batch, backtrack=False):
         seqs, labels = batch
-        logits = self.model(seqs)  # B x T x V
+        logits = self.model(seqs, backtrack=backtrack)  # B x T x V
 
         logits = logits.view(-1, logits.size(-1))  # (B*T) x V
         labels = labels.view(-1)  # B*T
         loss = self.ce(logits, labels)
         return loss
 
-    def calculate_metrics(self, batch):
+    def calculate_metrics(self, batch, backtrack=False):
         seqs, candidates, labels = batch
-        scores = self.model(seqs)  # B x T x V
+        scores = self.model(seqs, backtrack=backtrack)  # B x T x V
         scores = scores[:, -1, :]  # B x V
         scores = scores.gather(1, candidates)  # B x C
 
