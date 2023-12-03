@@ -21,6 +21,7 @@ class AbstractDataset(metaclass=ABCMeta):
         self.min_uc = args.min_uc
         self.min_sc = args.min_sc
         self.split = args.split
+        self.split_timestamp = args.split_timestamp
 
         assert self.min_uc >= 2, 'Need at least 2 ratings per user for validation and test'
 
@@ -60,6 +61,31 @@ class AbstractDataset(metaclass=ABCMeta):
         dataset = pickle.load(dataset_path.open('rb'))
         return dataset
 
+    # 定义一个函数来处理每个分组
+    def process_group(self,group):
+        # 按照timestamp进行排序
+        sorted_group = group.sort_values(by='timestamp')
+        # 找到时间戳大于self.split_timestamp部分
+        gt_larger = sorted_group[sorted_group['timestamp'] >= self.split_timestamp]
+        gt_smaller = sorted_group[sorted_group['timestamp'] < self.split_timestamp]
+        # 如果大于self.split_timestamp的部分存在，则保留时间戳小于self.split_timestamp的部分
+        # 和大于等于split_timestamp且最小的那个数据
+        if not (gt_larger.empty or gt_smaller.empty) and len(gt_larger)>=self.args.leaven and len(gt_smaller)>=3:
+            result = pd.concat([sorted_group[sorted_group['timestamp'] < self.split_timestamp], gt_larger.head(self.args.leaven)])
+        else:
+            # 如果大于等于self.split_timestamp的部分不存在，则不保留这个组
+            result = pd.DataFrame()
+        return result
+
+    def make_split_timestamp(self,df):
+        if self.split_timestamp!=0:
+            grouped_df = df.groupby('uid')
+            # 对每个分组应用处理函数
+            result_df = grouped_df.apply(self.process_group)
+            # 重置索引以得到最终结果
+            df = result_df.reset_index(drop=True)
+        return df
+
     def preprocess(self):
         dataset_path = self._get_preprocessed_dataset_path()
         if dataset_path.is_file():
@@ -70,6 +96,14 @@ class AbstractDataset(metaclass=ABCMeta):
         self.maybe_download_raw_dataset()
         df = self.load_ratings_df()
         df = self.make_implicit(df)
+
+        df = self.make_split_timestamp(df)
+        # # test 
+        # grouped_df = df.groupby('uid')
+        # validation_result = grouped_df.apply(lambda group: (group['timestamp'] >= self.split_timestamp).sum() == self.args.leaven)
+        # print(validation_result)
+        # assert False
+
         df = self.filter_triplets(df)
         df, umap, smap = self.densify_index(df)
         train, val, test = self.split_df(df, len(umap))
@@ -144,7 +178,9 @@ class AbstractDataset(metaclass=ABCMeta):
             train, val, test = {}, {}, {}
             for user in range(user_count):
                 items = user2items[user]
-                train[user], val[user], test[user] = items[:-2], items[-2:-1], items[-1:]
+                # train[user], val[user], test[user] = items[:-2], items[-2:-1], items[-1:]
+                # 将留1test扩展到留n，valid仍旧是一个
+                train[user], val[user], test[user] = items[:-self.args.leaven-1], items[-self.args.leaven-1:-self.args.leaven], items[-self.args.leaven:]
             return train, val, test
         elif self.args.split == 'holdout':
             print('Splitting')
@@ -183,8 +219,12 @@ class AbstractDataset(metaclass=ABCMeta):
 
     def _get_preprocessed_folder_path(self):
         preprocessed_root = self._get_preprocessed_root_path()
-        folder_name = '{}_min_rating{}-min_uc{}-min_sc{}-split{}' \
-            .format(self.code(), self.min_rating, self.min_uc, self.min_sc, self.split)
+        if self.args.split == 'leave_one_out':
+            folder_name = '{}_min_rating{}-min_uc{}-min_sc{}-split{}-timestamp{}-testsize{}' \
+            .format(self.code(), self.min_rating, self.min_uc, self.min_sc, self.split, self.split_timestamp,self.args.leaven)
+        else:
+            folder_name = '{}_min_rating{}-min_uc{}-min_sc{}-split{}-timestamp{}' \
+            .format(self.code(), self.min_rating, self.min_uc, self.min_sc, self.split, self.split_timestamp)
         return preprocessed_root.joinpath(folder_name)
 
     def _get_preprocessed_dataset_path(self):
