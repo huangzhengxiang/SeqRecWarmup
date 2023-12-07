@@ -5,6 +5,7 @@ from models import model_factory
 from dataloaders import dataloader_factory
 from trainers import trainer_factory
 from utils import *
+from visualization.vis_seqlen_distribution import vis_bucket
 
 
 def main(test_only=False, export_root=None, backtrack=False):
@@ -26,6 +27,7 @@ def main(test_only=False, export_root=None, backtrack=False):
         for j in range(len(args.ticks)-1):
             print(args.ticks[j],args.ticks[j+1])
             trainer.test(j)
+    vis_bucket(args, )
 
 
 if __name__ == '__main__':
