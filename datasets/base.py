@@ -72,8 +72,10 @@ class AbstractDataset(metaclass=ABCMeta):
         # 和大于等于split_timestamp且最小的那个数据
         if not (gt_larger.empty or gt_smaller.empty) and len(gt_larger)>=self.args.leaven and len(gt_smaller)>=3:
             result = pd.concat([sorted_group[sorted_group['timestamp'] < self.split_timestamp], gt_larger.head(self.args.leaven)])
-        else:
+        elif (gt_larger.empty or len(gt_larger)<self.args.leaven) and len(sorted_group['timestamp'])>self.args.leaven and len(gt_smaller)>=3:
+            result = pd.concat([sorted_group[sorted_group['timestamp'] < self.split_timestamp], sorted_group[sorted_group['timestamp'] >= self.split_timestamp]])
             # 如果大于等于self.split_timestamp的部分不存在，则不保留这个组
+        else:
             result = pd.DataFrame()
         return result
 
@@ -98,12 +100,13 @@ class AbstractDataset(metaclass=ABCMeta):
         df = self.make_implicit(df)
 
         df = self.make_split_timestamp(df)
-        # # test 
+        # test 
         # grouped_df = df.groupby('uid')
         # validation_result = grouped_df.apply(lambda group: (group['timestamp'] >= self.split_timestamp).sum() == self.args.leaven)
         # print(validation_result)
         # assert False
-
+        # df.to_csv("data.csv")
+        # assert False
         df = self.filter_triplets(df)
         df, umap, smap = self.densify_index(df)
         train, val, test = self.split_df(df, len(umap))

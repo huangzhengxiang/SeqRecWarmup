@@ -38,12 +38,13 @@ class BERTModel(BaseModel):
 
     @torch.no_grad()
     def backtrack_once(self,x):
+        device = x.device
         # backtrack the items here!
         indices = (0 == x).sum(dim=-1) - 1
         valid_indices = indices != -1
-        x[torch.arange(len(valid_indices))[valid_indices], indices[valid_indices]] = self.mask_token
+        x[torch.arange(len(valid_indices)).to(device=device)[valid_indices], indices[valid_indices]] = self.mask_token
         predict = torch.argmax(self.out(self.bert(x)),dim=-1)
-        x[torch.arange(len(valid_indices))[valid_indices], indices[valid_indices]] = predict[valid_indices, indices[valid_indices]]
+        x[torch.arange(len(valid_indices)).to(device=device)[valid_indices], indices[valid_indices]] = predict[valid_indices, indices[valid_indices]]
         return x
 
     @torch.no_grad()
