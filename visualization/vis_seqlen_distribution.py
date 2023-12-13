@@ -7,7 +7,10 @@ import pandas as pd
 from options import args
 from datasets import dataset_factory
 
-def vis_bucket(args, preprocessed_root=os.path.join(".", "Data", "preprocessed"), figure_root=os.path.join(".","MyImages")):
+def vis_bucket(args,
+                preprocessed_root=os.path.join(".", "Data", "preprocessed"),
+                figure_root=os.path.join(".","MyImages"),
+                lines=None):
     os.makedirs(preprocessed_root, exist_ok=True)
     os.makedirs(figure_root, exist_ok=True)
     
@@ -32,6 +35,9 @@ def vis_bucket(args, preprocessed_root=os.path.join(".", "Data", "preprocessed")
 
     plt.figure(figsize=(12, 8))
     plt.bar(labels, cnts_1, align='edge')
+    if not (lines is None):
+        for line in lines:
+            plt.plot(labels, line)
     plt.xlabel('Seq Length')
     plt.ylabel('Number of users')
     plt.title(f'{args.dataset_code}')
