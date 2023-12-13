@@ -58,7 +58,7 @@ parser.add_argument('--test_negative_sampling_seed', type=int, default=None)
 ################
 parser.add_argument('--trainer_code', type=str, default='bert', choices=TRAINERS.keys())
 # device #
-parser.add_argument('--device', type=str, default='cpu', choices=['cpu', 'cuda'])
+parser.add_argument('--device', type=str, default='cuda', choices=['cpu', 'cuda'])
 parser.add_argument('--num_gpu', type=int, default=1)
 parser.add_argument('--device_idx', type=str, default='0')
 # optimizer #
