@@ -31,6 +31,6 @@ if __name__ == '__main__':
     if args.mode == 'train':
         main()
     elif args.mode == "test":
-        main(True, os.path.join(".","experiments","test_2023-11-02_0"))
+        main(True, os.path.join(".","experiments","test_2023-11-17_6"))
     else:
         raise ValueError('Invalid mode')
