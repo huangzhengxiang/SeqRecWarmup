@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 class AbstractTrainer(metaclass=ABCMeta):
-    def __init__(self, args, model, train_loader, val_loader, test_loader, export_root):
+    def __init__(self, args, model, train_loader, val_loader, test_loader, export_root, backtrack=False):
         self.args = args
         self.device = args.device
         self.model = model.to(self.device)
@@ -38,6 +38,8 @@ class AbstractTrainer(metaclass=ABCMeta):
         self.add_extra_loggers()
         self.logger_service = LoggerService(self.train_loggers, self.val_loggers)
         self.log_period_as_iter = args.log_period_as_iter
+        
+        self.backtrack=backtrack
 
     @abstractmethod
     def add_extra_loggers(self):
@@ -57,11 +59,11 @@ class AbstractTrainer(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def calculate_loss(self, batch):
+    def calculate_loss(self, batch, backtrack=False):
         pass
 
     @abstractmethod
-    def calculate_metrics(self, batch):
+    def calculate_metrics(self, batch, backtrack=False):
         pass
 
     def train(self):
@@ -88,7 +90,7 @@ class AbstractTrainer(metaclass=ABCMeta):
             batch = [x.to(self.device) for x in batch]
 
             self.optimizer.zero_grad()
-            loss = self.calculate_loss(batch)
+            loss = self.calculate_loss(batch,self.backtrack)
             loss.backward()
 
             self.optimizer.step()
@@ -122,7 +124,7 @@ class AbstractTrainer(metaclass=ABCMeta):
             for batch_idx, batch in enumerate(tqdm_dataloader):
                 batch = [x.to(self.device) for x in batch]
 
-                metrics = self.calculate_metrics(batch)
+                metrics = self.calculate_metrics(batch,self.backtrack)
 
                 for k, v in metrics.items():
                     average_meter_set.update(k, v)
@@ -156,7 +158,7 @@ class AbstractTrainer(metaclass=ABCMeta):
             for batch_idx, batch in enumerate(tqdm_dataloader):
                 batch = [x.to(self.device) for x in batch]
 
-                metrics = self.calculate_metrics(batch)
+                metrics = self.calculate_metrics(batch,self.backtrack)
 
                 for k, v in metrics.items():
                     average_meter_set.update(k, v)

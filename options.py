@@ -88,6 +88,8 @@ parser.add_argument('--anneal_cap', type=float, default=0.2, help='Upper limit o
 parser.add_argument('--model_code', type=str, default='bert', choices=MODELS.keys())
 parser.add_argument('--model_init_seed', type=int, default=None)
 # BERT #
+parser.add_argument('--bert_backtrack',action="store_true",default=False, help='Whether or not to enable bert backtracking')
+parser.add_argument('--bert_backtrack_len', type=int, default=None, help='Length of sequence for bert backtracking')
 parser.add_argument('--bert_max_len', type=int, default=None, help='Length of sequence for bert')
 parser.add_argument('--bert_num_items', type=int, default=None, help='Number of total items')
 parser.add_argument('--bert_hidden_units', type=int, default=None, help='Size of hidden vectors (d_model)')
@@ -130,6 +132,7 @@ set_template(args)
 ################
 import numpy as np
 args.ticks = list(range(0, args.max_ticks, args.max_ticks//args.ticks)) + [np.inf]
+args.bert_backtrack = args.bert_backtrack or not(args.bert_backtrack_len is None)
 print("Ticks:")
 print(args.ticks)
 print(args.mode)

@@ -14,4 +14,4 @@ def dataloader_factory(args):
     dataloader = DATALOADERS[args.dataloader_code]
     dataloader = dataloader(args, dataset)
     train, val, test = dataloader.get_pytorch_dataloaders()
-    return train, val, test
+    return train, val[0], test, dataloader.CLOZE_MASK_TOKEN

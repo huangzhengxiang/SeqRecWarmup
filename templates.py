@@ -44,7 +44,7 @@ def set_template(args):
         args.bert_dropout = 0.1
         args.bert_hidden_units = 256
         args.bert_mask_prob = 0.15
-        args.bert_max_len = 100
+        args.bert_max_len = 100 if args.bert_max_len is None else args.bert_max_len
         args.bert_num_blocks = 2
         args.bert_num_heads = 4
     
