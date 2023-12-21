@@ -48,7 +48,7 @@ def vis_bucket(args,
     if not (lines is None):
         ax2 = ax1.twinx()
         ax2.set_ylabel(metric)
-        ax2.set_ylim(0.25,0.75)
+        ax2.set_ylim(max(min(lines["original"])-0.1,0.),min(max(lines["original"])+0.1,1.))
         for l,k in enumerate(lines.keys()):
             line=lines[k]
             ax2.plot(labels, line, c=colors[l+2], label=k)

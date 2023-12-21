@@ -28,6 +28,7 @@ python main.py --template train_bert
 python main.py --template train_bert --ticks 1 --mode test
 python main.py --template train_bert --ticks 20 --mode test
 python main.py --template train_bert --ticks 1 --mode test --bert_backtrack_len 3
+python main.py --template train_bert --ticks 20 --mode test --bert_backtrack_len 3 --max-ticks 100 
 ```
 
 ## DAE
