@@ -50,7 +50,11 @@ if __name__ == '__main__':
     if args.mode == 'train':
         main()
     elif args.mode == "test":
-        main(True, os.path.join(".","experiments","test_2023-11-17_6"), args.bert_backtrack)
-        # main(True, os.path.join(".","experiments","test_2023-11-02_0"), args.bert_backtrack)
+        if args.dataset_code == "ml-1m":
+            main(True, os.path.join(".","experiments","ml-1m-best"), args.bert_backtrack)
+        elif args.dataset_code == "ml-20m":
+            main(True, os.path.join(".","experiments","ml-20m-best"), args.bert_backtrack)
+        else:
+            raise NotImplementedError
     else:
         raise ValueError('Invalid mode')
