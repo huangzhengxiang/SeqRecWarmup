@@ -26,9 +26,11 @@ def main(test_only=False, export_root=None, backtrack=False):
     def trainer_inf(args, trainer, metric="NDCG@10"):
         meter_list = []
         for j in range(len(args.ticks)-1):
-            print(args.ticks[j],args.ticks[j+1])
             avg_meters = trainer.test(j)
-            meter_list.append(avg_meters[metric])
+            if metric in avg_meters:
+                meter_list.append(avg_meters[metric])
+            else:
+                meter_list.append(0.)
         return meter_list
     
     if test_model:

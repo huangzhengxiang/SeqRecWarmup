@@ -45,13 +45,24 @@ def vis_bucket(args,
     ax1.set_xlabel('Seq Length')
     ax1.set_ylabel('Number of users')
 
+    def remove_zeros(cnt: list, x: list, y: list):
+        new_x=[]
+        new_y=[]
+        for j in range(len(cnt)):
+            if (type(cnt[j])==int and cnt[j]!=0) \
+                or (type(cnt[j])==float and cnt[j]!=0.):
+                new_x.append(x[j])
+                new_y.append(y[j])
+        return new_x, new_y
+
     if not (lines is None):
         ax2 = ax1.twinx()
         ax2.set_ylabel(metric)
-        ax2.set_ylim(max(min(lines["original"])-0.1,0.),min(max(lines["original"])+0.1,1.))
+        _, lines_ylim = remove_zeros(cnts_1, labels, lines["original"])
+        ax2.set_ylim(max(min(lines_ylim)-0.1,0.),min(max(lines_ylim)+0.1,1.))
         for l,k in enumerate(lines.keys()):
-            line=lines[k]
-            ax2.plot(labels, line, c=colors[l+2], label=k)
+            labels_new, line = remove_zeros(cnts_1, labels, lines[k])
+            ax2.plot(labels_new, line, c=colors[l+2], label=k)
         ax2.legend(loc='upper right')
 
     plt.title(f'{args.dataset_code}')
