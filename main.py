@@ -49,5 +49,6 @@ if __name__ == '__main__':
         main()
     elif args.mode == "test":
         main(True, os.path.join(".","experiments","test_2023-11-17_6"), args.bert_backtrack)
+        # main(True, os.path.join(".","experiments","test_2023-11-02_0"), args.bert_backtrack)
     else:
         raise ValueError('Invalid mode')
